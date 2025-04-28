@@ -193,3 +193,8 @@ dist
 # End of https://www.toptal.com/developers/gitignore/api/node,java,jsonnet,visualstudiocode
 
 node_modules/
+node_modules/*
+*.json
+
+ssl/*.pem
+ssl/*.key
