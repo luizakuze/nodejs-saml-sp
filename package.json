@@ -17,8 +17,10 @@
     "file-system-cache": "^1.0.5",
     "morgan": "^1.10.0",
     "passport": "^0.6.0",
+    "passport-saml": "^3.2.4",
     "passport-saml-metadata": "^5.0.0",
     "pem-promise": "^1.0.0",
-    "pug": "^3.0.3"
+    "pug": "^3.0.3",
+    "xml2js": "^0.6.2"
   }
 }

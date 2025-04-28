@@ -1,23 +1,23 @@
 require('dotenv').config();
-const os           = require('os');
-const https        = require('https');
-const path         = require('path');
-const express      = require('express');
-const passport     = require('passport');
-const morgan       = require('morgan');
+const os = require('os');
+const https = require('https');
+const path = require('path');
+const express = require('express');
+const passport = require('passport');
+const morgan = require('morgan');
 const cookieParser = require('cookie-parser');
-const session      = require('express-session');
-const getSsl       = require('./ssl');
+const session = require('express-session');
+const getSsl = require('./ssl');
 
-const env    = process.env.NODE_ENV || 'development';
+const env = process.env.NODE_ENV || 'development';
 const config = require('./config/config')[env];
 
 const app = express();
 
 /* ─── Express & view engine ────────────────────────────────────────── */
-app.set('port',     config.app.port);
+app.set('port', config.app.port);
 app.set('hostname', config.app.hostname);
-app.set('views',    path.join(__dirname, 'app/views'));
+app.set('views', path.join(__dirname, 'app/views'));
 app.set('view engine', 'pug');
 
 app.use(morgan('combined'));
@@ -39,18 +39,40 @@ app.use(passport.session());
 app.use(express.static(path.join(__dirname, 'public')));
 
 /* ─── Metadata SAML (/saml2/metadata) ──────────────────────────────── */
-app.get('/saml2/metadata', (req, res) => {
-  // A estratégia já foi registrada em ./config/passport.js
+/* ─── Metadata SAML (/saml2/metadata) ─────────────────────────────── */
+app.get('/saml2/metadata', async (req, res) => {
+  const fs   = require('fs');
+  const deco = require('./config/metadataDecorator');
+
   const saml = passport._strategy('saml');
 
-  // Lê seu certificado público para assinar o metadata.
-  // (ou deixe vazio se não quiser <ds:Signature>)
-  const fs = require('fs');
-  const pubCert = fs.readFileSync('./certs/sp-public-cert.pem', 'utf-8');
+  const cert = fs.readFileSync('./certs/sp-public-cert.pem', 'utf-8');
+  let xml    = saml.generateServiceProviderMetadata(cert, cert);
 
-  const xml = saml.generateServiceProviderMetadata(pubCert, pubCert);
+  xml = await deco(xml, {
+    uiInfo: {
+      displayName: 'SP NODE JS',
+      description: 'Provedor de serviços Node JS',
+      infoUrl:     'http://sp.information.url/',
+      privacyUrl:  'http://sp.privacy.url/'
+    },
+    discoveryUrl: `${config.app.host.startsWith('http') ? config.app.host : 'https://' + config.app.host}/login/disco`,
+    org: {
+      name:        'GIdLab',
+      displayName: 'GIdLab',
+      url:         'http://gidlab.rnp.br/'
+    },
+    techContact: {
+      company:   'RNP',
+      givenName: 'GIdLab',
+      surName:   'Equipe',
+      email:     'gidlab@rnp.br'
+    }
+  });
+
   res.type('application/samlmetadata+xml').send(xml);
 });
+
 
 /* ─── Rotas da aplicação ───────────────────────────────────────────── */
 require('./config/routes')(app, config, passport);

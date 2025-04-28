@@ -1,5 +1,6 @@
 const metadata = require('passport-saml-metadata');
-const { Strategy: SamlStrategy } = require('@node-saml/passport-saml');
+const SamlStrategy = require('passport-saml').Strategy;
+const fs = require('fs'); // Melhor já importar no topo
 
 module.exports = function (app, passport, config) {
   metadata.fetch(config.passport.saml.metadata)
@@ -17,16 +18,23 @@ module.exports = function (app, passport, config) {
       strategyConfig.acceptUnsolicitedResponses = false;
       strategyConfig.authnRequestsSigned = true;
 
+      // 💥 Garante que o cert está presente
+      const spPublicCert = fs.readFileSync('./certs/sp-public-cert.pem', 'utf-8');
+
+      strategyConfig.cert = strategyConfig.cert || spPublicCert;
+      strategyConfig.privateKey = fs.readFileSync('./certs/sp-private-key.pem', 'utf-8');
+      strategyConfig.decryptionPvk = strategyConfig.privateKey;
+
       passport.use('saml', new SamlStrategy(strategyConfig, function (profile, done) {
         profile = metadata.claimsToCamelCase(profile, reader.claimSchema);
         return done(null, profile);
       }));
 
-      passport.serializeUser(function(user, done) {
+      passport.serializeUser(function (user, done) {
         done(null, user);
       });
 
-      passport.deserializeUser(function(user, done) {
+      passport.deserializeUser(function (user, done) {
         done(null, user);
       });
     })
