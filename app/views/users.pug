@@ -1,0 +1,35 @@
+doctype html
+html
+  head
+    meta(charset='utf-8')
+    title Informações do Usuário
+    style.
+      body{display:flex;justify-content:center;align-items:center;height:100vh;margin:0;background:#f5f5f5;font-family:Arial}
+      .user-info{background:#fff;padding:30px;border-radius:8px;width:700px;margin:auto;box-shadow:0 4px 8px rgba(0,0,0,.1)}
+      h2,form{text-align:center}
+      table{width:100%;border-collapse:collapse;margin-bottom:25px}
+      th,td{padding:12px;border-bottom:1px solid #eee;text-align:center}
+      th{background:#f0f0f0}
+      .logout-btn{padding:10px 20px;background:#dc3545;color:#fff;border:0;border-radius:4px;cursor:pointer}
+      .logout-btn:hover{background:#c82333}
+  body
+    .user-info
+      h2 Informações do usuário
+      table
+        tr
+          th Atributo
+          th Valor
+        tr
+          td Username
+          td #{username || '—'}
+        tr
+          td Email
+          td #{email || '—'}
+        tr
+          td First Name
+          td #{firstName || '—'}
+        tr
+          td Last Name
+          td #{lastName || '—'}
+      form(method='get' action='/logout')
+        button.logout-btn(type='submit') Sair

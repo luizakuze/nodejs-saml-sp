@@ -1,0 +1,19 @@
+doctype html
+html
+  head
+    meta(charset='utf-8')
+    title Provedor de Serviço Node.js
+    style.
+      body{display:flex;justify-content:center;align-items:center;height:100vh;background:#f5f5f5;margin:0;font-family:Arial}
+      .auth-container{background:#fff;padding:30px;border-radius:8px;box-shadow:0 4px 8px rgba(0,0,0,.1);text-align:center;width:350px}
+      h1{font-size:22px;margin-bottom:20px;color:#333}
+      .auth-button{width:100%;background:#007bff;color:#fff;padding:12px;border:0;border-radius:4px;cursor:pointer;font-size:16px;margin-top:15px}
+      .auth-button:hover{background:#0056b3}
+  body
+    .auth-container
+      h1 Provedor de Serviço
+      p(style='margin:-10px 0 20px;color:#666;font-size:14px')
+        | Desenvolvido em 
+        strong Node.js
+      form(method='post' action='/')
+        button.auth-button(type='submit') Entrar
