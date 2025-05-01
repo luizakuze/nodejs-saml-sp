@@ -1,20 +1,29 @@
 const { parseStringPromise, Builder } = require('xml2js');
 
-module.exports = async function decorate(xml, { uiInfo, discoveryUrl, org, techContact }) {
+module.exports = async function decorate(xml, {
+  uiInfo,
+  discoveryUrl,
+  org,
+  techContact,
+  certBase64,
+  entityID
+}) {
   const doc = await parseStringPromise(xml);
   const entityDescriptor = doc.EntityDescriptor;
   const spsso = entityDescriptor.SPSSODescriptor[0];
 
-  /** a) Ajustar atributos do EntityDescriptor */
+  // a) EntityDescriptor
+  entityDescriptor.$.entityID = entityID;
   entityDescriptor.$['xmlns:saml2'] = 'urn:oasis:names:tc:SAML:2.0:assertion';
-  entityDescriptor.$['cacheDuration'] = 'PT1H';
+  entityDescriptor.$.ID = entityID.replace(/[^\w]/g, '_');
+  entityDescriptor.$.cacheDuration = 'PT1H';
 
-  /** b) Ajustar atributos do SPSSODescriptor */
-  spsso.$['AuthnRequestsSigned'] = 'true';
-  spsso.$['WantAssertionsSigned'] = 'true';
-  spsso.$['protocolSupportEnumeration'] = 'urn:oasis:names:tc:SAML:2.0:protocol';
+  // b) SPSSODescriptor
+  spsso.$.AuthnRequestsSigned = 'true';
+  spsso.$.WantAssertionsSigned = 'true';
+  spsso.$.protocolSupportEnumeration = 'urn:oasis:names:tc:SAML:2.0:protocol';
 
-  /** c) Criar Extensions */
+  // c) Extensions
   const extensions = {
     'mdui:UIInfo': [{
       '$': { 'xmlns:mdui': 'urn:oasis:names:tc:SAML:metadata:ui' },
@@ -46,80 +55,99 @@ module.exports = async function decorate(xml, { uiInfo, discoveryUrl, org, techC
     }]
   };
 
-  /** d) Ajustar SingleLogoutService */
-  let singleLogoutServices = [];
-  if (spsso.SingleLogoutService) {
-    spsso.SingleLogoutService.forEach(sls => {
-      sls.$.Binding = 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect';
-      singleLogoutServices.push(sls);
-    });
-  }
+  // d) Certificado formatado com quebras de linha
+  const formattedCert = certBase64.replace(/(.{64})/g, '$1\n');
 
-  /** e) Ajustar NameIDFormat */
+  // e) KeyDescriptors
+  const keyDescriptors = [
+    {
+      $: { use: 'signing' },
+      'ds:KeyInfo': [{
+        'ds:X509Data': [{
+          'ds:X509Certificate': [formattedCert]
+        }]
+      }]
+    },
+    {
+      $: { use: 'encryption' },
+      'ds:KeyInfo': [{
+        'ds:X509Data': [{
+          'ds:X509Certificate': [formattedCert]
+        }]
+      }],
+      EncryptionMethod: [
+        { $: { Algorithm: 'http://www.w3.org/2009/xmlenc11#aes256-gcm' } },
+        { $: { Algorithm: 'http://www.w3.org/2009/xmlenc11#aes128-gcm' } },
+        { $: { Algorithm: 'http://www.w3.org/2001/04/xmlenc#aes256-cbc' } },
+        { $: { Algorithm: 'http://www.w3.org/2001/04/xmlenc#aes128-cbc' } }
+      ]
+    }
+  ];
+
+  // f) SingleLogoutService – corrigido
+  const logoutLocation = entityID.replace(/\/saml2\/metadata\/?$/, '') + '/logout';
+  const singleLogoutServices = [{
+    $: {
+      Binding: 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect',
+      Location: logoutLocation
+    }
+  }];
+
+  // g) NameIDFormat
   const nameIDFormat = ['urn:oasis:names:tc:SAML:2.0:nameid-format:persistent'];
 
-  /** f) Ajustar AssertionConsumerService */
-  const acsList = [];
-  if (spsso.AssertionConsumerService) {
-    const baseAcs = spsso.AssertionConsumerService[0];
-    baseAcs.$.index = '0';
-    baseAcs.$.isDefault = 'true';
-    acsList.push(baseAcs);
-
-    acsList.push({
+  // h) AssertionConsumerService
+  const acsLocation = entityID.replace(/\/saml2\/metadata\/?$/, '') + '/login/callback';
+  const acsList = [
+    {
       $: {
-        Binding: 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Artifact',
-        Location: baseAcs.$.Location,
-        index: '1',
-        isDefault: 'false'
+        index: '0',
+        isDefault: 'true',
+        Binding: 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST',
+        Location: acsLocation
       }
-    });
-  }
+    },
+    {
+      $: {
+        index: '1',
+        isDefault: 'false',
+        Binding: 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Artifact',
+        Location: acsLocation
+      }
+    }
+  ];
 
-  /** g) Rearranjar SPSSODescriptor na ordem correta */
-  const keyDescriptors = spsso.KeyDescriptor || [];
-
-  // Zera tudo para inserir na ordem
-  delete spsso.Extensions;
-  delete spsso.KeyDescriptor;
-  delete spsso.SingleLogoutService;
-  delete spsso.NameIDFormat;
-  delete spsso.AssertionConsumerService;
-
-  // Insere na ordem correta
+  // i) Atualiza SPSSODescriptor com ordem correta
   spsso.Extensions = [extensions];
   spsso.KeyDescriptor = keyDescriptors;
-  if (singleLogoutServices.length > 0) {
-    spsso.SingleLogoutService = singleLogoutServices;
-  }
+  spsso.SingleLogoutService = singleLogoutServices;
   spsso.NameIDFormat = nameIDFormat;
   spsso.AssertionConsumerService = acsList;
 
-  /** h) Organization */
+  // j) Organization
   entityDescriptor.Organization = [{
-    'OrganizationName': [{
+    OrganizationName: [{
       _: org.name,
-      '$': { 'xml:lang': 'pt-br' }
+      $: { 'xml:lang': 'pt-br' }
     }],
-    'OrganizationDisplayName': [{
+    OrganizationDisplayName: [{
       _: org.displayName,
-      '$': { 'xml:lang': 'pt-br' }
+      $: { 'xml:lang': 'pt-br' }
     }],
-    'OrganizationURL': [{
+    OrganizationURL: [{
       _: org.url,
-      '$': { 'xml:lang': 'pt-br' }
+      $: { 'xml:lang': 'pt-br' }
     }]
   }];
 
-  /** i) ContactPerson */
+  // k) ContactPerson
   entityDescriptor.ContactPerson = [{
-    '$': { contactType: 'technical' },
-    'Company': [techContact.company],
-    'GivenName': [techContact.givenName],
-    'SurName': [techContact.surName],
-    'EmailAddress': [techContact.email]
+    $: { contactType: 'technical' },
+    Company: [techContact.company],
+    GivenName: [techContact.givenName],
+    SurName: [techContact.surName],
+    EmailAddress: [techContact.email]
   }];
 
-  /** j) Retornar XML formatado */
   return new Builder({ headless: false }).buildObject(doc);
 };

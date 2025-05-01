@@ -6,6 +6,7 @@ const passport  = require('passport');
 const usersCtl  = require('../controllers/usersController');
 const homeCtl   = require('../controllers/homeController');
 const logoutCtl = require('../controllers/logoutController');
+const metadataCtl = require('../controllers/metadataController');
 
 /* -------------------------------------------------------------
  * BASE_URL: usado para o retorno do Discovery Service
@@ -64,5 +65,7 @@ router.get(
   (req, res, next) => (req.isAuthenticated() ? next() : res.redirect('/')),
   usersCtl.index
 );
+
+router.get('/saml2/metadata', metadataCtl);
 
 module.exports = router;
