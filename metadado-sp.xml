@@ -1,46 +1,91 @@
-<EntityDescriptor xmlns="urn:oasis:names:tc:SAML:2.0:metadata" xmlns:ds="http://www.w3.org/2000/09/xmldsig#" xmlns:saml2="urn:oasis:names:tc:SAML:2.0:assertion" ID="https___sp_node_8000_saml2_metadata_" entityID="https://sp-node:8000/saml2/metadata/" cacheDuration="PT1H">
-    <SPSSODescriptor AuthnRequestsSigned="true" WantAssertionsSigned="true" protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol">
-    <Extensions>
-    <mdui:UIInfo xmlns:mdui="urn:oasis:names:tc:SAML:metadata:ui">
-    <mdui:DisplayName xml:lang="en">SP NODE JS</mdui:DisplayName>
-    <mdui:Description xml:lang="en">Provedor de servicos Node JS</mdui:Description>
-    <mdui:InformationURL xml:lang="en">http://sp.information.url/</mdui:InformationURL>
-    <mdui:PrivacyStatementURL xml:lang="en">http://sp.privacy.url/</mdui:PrivacyStatementURL>
-    </mdui:UIInfo>
-    <DiscoveryResponse xmlns="urn:oasis:names:tc:SAML:profiles:SSO:idp-discovery-protocol" Binding="urn:oasis:names:tc:SAML:profiles:SSO:idp-discovery-protocol" Location="https://sp-node:8000/login/disco" isDefault="true" index="0"/>
-    </Extensions>
-    <KeyDescriptor use="signing">
-    <ds:KeyInfo>
-    <ds:X509Data>
-    <ds:X509Certificate>MIIDBTCCAe2gAwIBAgIUfb44R7W808u1knpz99Db/I/a78kwDQYJKoZIhvcNAQEL BQAwEjEQMA4GA1UEAwwHc3Atbm9kZTAeFw0yNTA0MjgyMjMwMTJaFw0yNjA0Mjgy MjMwMTJaMBIxEDAOBgNVBAMMB3NwLW5vZGUwggEiMA0GCSqGSIb3DQEBAQUAA4IB DwAwggEKAoIBAQCxC/kXu78hIjypWu86njvrS6bNHvv48Y0P4/ua/eiep4lHamdF x67sWe9tCWXon6E0ivvhe+dbuxKGP4+8b07lFaC05IG0cFZ6Ok1ey6JTDRznQMDp URv/grEmF8zXuS7NnBxhLyovDq7dKr/4D/MK6AJAOJREJ7j9OomiVsJhZIP+rv3G Vn9hAck0KgETM7gYYc5rStP2cYdWCBv8/pl6wCbDAbHpd7DFC+xlnhAyGR7K0Gco nNpWckY1ef7gx83QlFo0DizLDuGNZrkn0OeuFvKm3LM6ZVoQi3IRo84DMc/K7JgI nTFTbUq8IpB+oAuWWk45YItMV50w1c8B2SoBAgMBAAGjUzBRMB0GA1UdDgQWBBS9 3Jh1JQOtbBxIYOgk2ftw7QAB1DAfBgNVHSMEGDAWgBS93Jh1JQOtbBxIYOgk2ftw 7QAB1DAPBgNVHRMBAf8EBTADAQH/MA0GCSqGSIb3DQEBCwUAA4IBAQBZ+w0w7LXl vtZ0VvJU3wihrsJllFCwgOZk3cfO5Z9VjesOVC3XVYYe2zAbJxr7/aowXT0LcS6j u2roQc6Y6tLZfq/9VGu+LkGjEowotQESjQgoJm+mBM6gWJxse1Ejqn+nyyHk2jzG QN1OZERT0alWBbisgQ6STP+eoFIgksrte9B+AzbW8kQOJHwIUz1d7loH5LgbBYwe cWTfYCRVNSTPmNjR/tjUKlc/uxmVB49YNe+puZEVxkhrxbTL6JM/JeJbOnIQH8El 59aCip3hbu7+WGi1Nmh+YBmfJj/fvJ489Mv9a7afrnhmbCZri/9hwqHw68N4/cRj 6iXKbnKib6Jf</ds:X509Certificate>
-    </ds:X509Data>
-    </ds:KeyInfo>
-    </KeyDescriptor>
-    <KeyDescriptor use="encryption">
-    <ds:KeyInfo>
-    <ds:X509Data>
-    <ds:X509Certificate>MIIDBTCCAe2gAwIBAgIUfb44R7W808u1knpz99Db/I/a78kwDQYJKoZIhvcNAQEL BQAwEjEQMA4GA1UEAwwHc3Atbm9kZTAeFw0yNTA0MjgyMjMwMTJaFw0yNjA0Mjgy MjMwMTJaMBIxEDAOBgNVBAMMB3NwLW5vZGUwggEiMA0GCSqGSIb3DQEBAQUAA4IB DwAwggEKAoIBAQCxC/kXu78hIjypWu86njvrS6bNHvv48Y0P4/ua/eiep4lHamdF x67sWe9tCWXon6E0ivvhe+dbuxKGP4+8b07lFaC05IG0cFZ6Ok1ey6JTDRznQMDp URv/grEmF8zXuS7NnBxhLyovDq7dKr/4D/MK6AJAOJREJ7j9OomiVsJhZIP+rv3G Vn9hAck0KgETM7gYYc5rStP2cYdWCBv8/pl6wCbDAbHpd7DFC+xlnhAyGR7K0Gco nNpWckY1ef7gx83QlFo0DizLDuGNZrkn0OeuFvKm3LM6ZVoQi3IRo84DMc/K7JgI nTFTbUq8IpB+oAuWWk45YItMV50w1c8B2SoBAgMBAAGjUzBRMB0GA1UdDgQWBBS9 3Jh1JQOtbBxIYOgk2ftw7QAB1DAfBgNVHSMEGDAWgBS93Jh1JQOtbBxIYOgk2ftw 7QAB1DAPBgNVHRMBAf8EBTADAQH/MA0GCSqGSIb3DQEBCwUAA4IBAQBZ+w0w7LXl vtZ0VvJU3wihrsJllFCwgOZk3cfO5Z9VjesOVC3XVYYe2zAbJxr7/aowXT0LcS6j u2roQc6Y6tLZfq/9VGu+LkGjEowotQESjQgoJm+mBM6gWJxse1Ejqn+nyyHk2jzG QN1OZERT0alWBbisgQ6STP+eoFIgksrte9B+AzbW8kQOJHwIUz1d7loH5LgbBYwe cWTfYCRVNSTPmNjR/tjUKlc/uxmVB49YNe+puZEVxkhrxbTL6JM/JeJbOnIQH8El 59aCip3hbu7+WGi1Nmh+YBmfJj/fvJ489Mv9a7afrnhmbCZri/9hwqHw68N4/cRj 6iXKbnKib6Jf</ds:X509Certificate>
-    </ds:X509Data>
-    </ds:KeyInfo>
-    <EncryptionMethod Algorithm="http://www.w3.org/2009/xmlenc11#aes256-gcm"/>
-    <EncryptionMethod Algorithm="http://www.w3.org/2009/xmlenc11#aes128-gcm"/>
-    <EncryptionMethod Algorithm="http://www.w3.org/2001/04/xmlenc#aes256-cbc"/>
-    <EncryptionMethod Algorithm="http://www.w3.org/2001/04/xmlenc#aes128-cbc"/>
-    </KeyDescriptor>
-    <SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="https://sp-node:8000/logout"/>
-    <NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:persistent</NameIDFormat>
-    <AssertionConsumerService index="0" isDefault="true" Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="https://sp-node:8000/login/callback"/>
-    <AssertionConsumerService index="1" isDefault="false" Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Artifact" Location="https://sp-node:8000/login/callback"/>
+<EntityDescriptor xmlns="urn:oasis:names:tc:SAML:2.0:metadata"
+    xmlns:ds="http://www.w3.org/2000/09/xmldsig#"
+    xmlns:saml2="urn:oasis:names:tc:SAML:2.0:assertion" ID="https___sp_node_8000_saml2_metadata_"
+    entityID="https://sp-node:8000/saml2/metadata/" cacheDuration="PT1H">
+    <SPSSODescriptor AuthnRequestsSigned="true" WantAssertionsSigned="true"
+        protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol">
+        <Extensions>
+            <mdui:UIInfo xmlns:mdui="urn:oasis:names:tc:SAML:metadata:ui">
+                <mdui:DisplayName xml:lang="en">SP NODE JS</mdui:DisplayName>
+                <mdui:Description xml:lang="en">Provedor de servicos Node JS</mdui:Description>
+                <mdui:InformationURL xml:lang="en">http://sp.information.url/</mdui:InformationURL>
+                <mdui:PrivacyStatementURL xml:lang="en">http://sp.privacy.url/</mdui:PrivacyStatementURL>
+            </mdui:UIInfo>
+            <DiscoveryResponse xmlns="urn:oasis:names:tc:SAML:profiles:SSO:idp-discovery-protocol"
+                Binding="urn:oasis:names:tc:SAML:profiles:SSO:idp-discovery-protocol"
+                Location="https://sp-node:8000/login/disco" isDefault="true" index="0" />
+        </Extensions>
+        <KeyDescriptor use="signing">
+            <ds:KeyInfo>
+                <ds:X509Data>
+                    <ds:X509Certificate>MIIDBTCCAe2gAwIBAgIUfb44R7W808u1knpz99Db/I/a78kwDQYJKoZIhvcNAQEL
+                        BQAwEjEQMA4GA1UEAwwHc3Atbm9kZTAeFw0yNTA0MjgyMjMwMTJaFw0yNjA0Mjgy
+                        MjMwMTJaMBIxEDAOBgNVBAMMB3NwLW5vZGUwggEiMA0GCSqGSIb3DQEBAQUAA4IB
+                        DwAwggEKAoIBAQCxC/kXu78hIjypWu86njvrS6bNHvv48Y0P4/ua/eiep4lHamdF
+                        x67sWe9tCWXon6E0ivvhe+dbuxKGP4+8b07lFaC05IG0cFZ6Ok1ey6JTDRznQMDp
+                        URv/grEmF8zXuS7NnBxhLyovDq7dKr/4D/MK6AJAOJREJ7j9OomiVsJhZIP+rv3G
+                        Vn9hAck0KgETM7gYYc5rStP2cYdWCBv8/pl6wCbDAbHpd7DFC+xlnhAyGR7K0Gco
+                        nNpWckY1ef7gx83QlFo0DizLDuGNZrkn0OeuFvKm3LM6ZVoQi3IRo84DMc/K7JgI
+                        nTFTbUq8IpB+oAuWWk45YItMV50w1c8B2SoBAgMBAAGjUzBRMB0GA1UdDgQWBBS9
+                        3Jh1JQOtbBxIYOgk2ftw7QAB1DAfBgNVHSMEGDAWgBS93Jh1JQOtbBxIYOgk2ftw
+                        7QAB1DAPBgNVHRMBAf8EBTADAQH/MA0GCSqGSIb3DQEBCwUAA4IBAQBZ+w0w7LXl
+                        vtZ0VvJU3wihrsJllFCwgOZk3cfO5Z9VjesOVC3XVYYe2zAbJxr7/aowXT0LcS6j
+                        u2roQc6Y6tLZfq/9VGu+LkGjEowotQESjQgoJm+mBM6gWJxse1Ejqn+nyyHk2jzG
+                        QN1OZERT0alWBbisgQ6STP+eoFIgksrte9B+AzbW8kQOJHwIUz1d7loH5LgbBYwe
+                        cWTfYCRVNSTPmNjR/tjUKlc/uxmVB49YNe+puZEVxkhrxbTL6JM/JeJbOnIQH8El
+                        59aCip3hbu7+WGi1Nmh+YBmfJj/fvJ489Mv9a7afrnhmbCZri/9hwqHw68N4/cRj
+                        6iXKbnKib6Jf</ds:X509Certificate>
+                </ds:X509Data>
+            </ds:KeyInfo>
+        </KeyDescriptor>
+        <KeyDescriptor use="encryption">
+            <ds:KeyInfo>
+                <ds:X509Data>
+                    <ds:X509Certificate>MIIDBTCCAe2gAwIBAgIUfb44R7W808u1knpz99Db/I/a78kwDQYJKoZIhvcNAQEL
+                        BQAwEjEQMA4GA1UEAwwHc3Atbm9kZTAeFw0yNTA0MjgyMjMwMTJaFw0yNjA0Mjgy
+                        MjMwMTJaMBIxEDAOBgNVBAMMB3NwLW5vZGUwggEiMA0GCSqGSIb3DQEBAQUAA4IB
+                        DwAwggEKAoIBAQCxC/kXu78hIjypWu86njvrS6bNHvv48Y0P4/ua/eiep4lHamdF
+                        x67sWe9tCWXon6E0ivvhe+dbuxKGP4+8b07lFaC05IG0cFZ6Ok1ey6JTDRznQMDp
+                        URv/grEmF8zXuS7NnBxhLyovDq7dKr/4D/MK6AJAOJREJ7j9OomiVsJhZIP+rv3G
+                        Vn9hAck0KgETM7gYYc5rStP2cYdWCBv8/pl6wCbDAbHpd7DFC+xlnhAyGR7K0Gco
+                        nNpWckY1ef7gx83QlFo0DizLDuGNZrkn0OeuFvKm3LM6ZVoQi3IRo84DMc/K7JgI
+                        nTFTbUq8IpB+oAuWWk45YItMV50w1c8B2SoBAgMBAAGjUzBRMB0GA1UdDgQWBBS9
+                        3Jh1JQOtbBxIYOgk2ftw7QAB1DAfBgNVHSMEGDAWgBS93Jh1JQOtbBxIYOgk2ftw
+                        7QAB1DAPBgNVHRMBAf8EBTADAQH/MA0GCSqGSIb3DQEBCwUAA4IBAQBZ+w0w7LXl
+                        vtZ0VvJU3wihrsJllFCwgOZk3cfO5Z9VjesOVC3XVYYe2zAbJxr7/aowXT0LcS6j
+                        u2roQc6Y6tLZfq/9VGu+LkGjEowotQESjQgoJm+mBM6gWJxse1Ejqn+nyyHk2jzG
+                        QN1OZERT0alWBbisgQ6STP+eoFIgksrte9B+AzbW8kQOJHwIUz1d7loH5LgbBYwe
+                        cWTfYCRVNSTPmNjR/tjUKlc/uxmVB49YNe+puZEVxkhrxbTL6JM/JeJbOnIQH8El
+                        59aCip3hbu7+WGi1Nmh+YBmfJj/fvJ489Mv9a7afrnhmbCZri/9hwqHw68N4/cRj
+                        6iXKbnKib6Jf</ds:X509Certificate>
+                </ds:X509Data>
+            </ds:KeyInfo>
+            <EncryptionMethod Algorithm="http://www.w3.org/2009/xmlenc11#aes256-gcm" />
+            <EncryptionMethod Algorithm="http://www.w3.org/2009/xmlenc11#aes128-gcm" />
+            <EncryptionMethod Algorithm="http://www.w3.org/2001/04/xmlenc#aes256-cbc" />
+            <EncryptionMethod Algorithm="http://www.w3.org/2001/04/xmlenc#aes128-cbc" />
+        </KeyDescriptor>
+        <SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect"
+            Location="https://sp-node:8000/logout" />
+        <SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"
+            Location="https://sp-node:8000/logout/post" />
+        <NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:persistent</NameIDFormat>
+        <AssertionConsumerService index="0" isDefault="true"
+            Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"
+            Location="https://sp-node:8000/login/callback" />
+        <AssertionConsumerService index="1" isDefault="false"
+            Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Artifact"
+            Location="https://sp-node:8000/login/callback" />
     </SPSSODescriptor>
     <Organization>
-    <OrganizationName xml:lang="pt-br">GIdLab</OrganizationName>
-    <OrganizationDisplayName xml:lang="pt-br">GIdLab</OrganizationDisplayName>
-    <OrganizationURL xml:lang="pt-br">http://gidlab.rnp.br/</OrganizationURL>
+        <OrganizationName xml:lang="pt-br">GIdLab</OrganizationName>
+        <OrganizationDisplayName xml:lang="pt-br">GIdLab</OrganizationDisplayName>
+        <OrganizationURL xml:lang="pt-br">http://gidlab.rnp.br/</OrganizationURL>
     </Organization>
     <ContactPerson contactType="technical">
-    <Company>RNP</Company>
-    <GivenName>GIdLab</GivenName>
-    <SurName>Equipe</SurName>
-    <EmailAddress>gidlab@rnp.br</EmailAddress>
+        <Company>RNP</Company>
+        <GivenName>GIdLab</GivenName>
+        <SurName>Equipe</SurName>
+        <EmailAddress>gidlab@rnp.br</EmailAddress>
     </ContactPerson>
-    </EntityDescriptor>
+</EntityDescriptor>

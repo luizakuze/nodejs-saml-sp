@@ -17,10 +17,12 @@ module.exports = async function decorate(xml, {
   entityDescriptor.$.cacheDuration = 'PT1H';
   entityDescriptor.$['xmlns:saml2'] = 'urn:oasis:names:tc:SAML:2.0:assertion';
 
-  // Formatando certificado (64 colunas)
+  // Certificado formatado (64 colunas)
   const formattedCert = certBase64.replace(/(.{64})/g, '$1\n');
 
-  // Construindo SPSSODescriptor na ordem correta
+  // Construção do SPSSODescriptor na ordem exata exigida
+  const baseUrl = entityID.replace(/\/saml2\/metadata\/?$/, '');
+
   const spsso = {
     $: {
       AuthnRequestsSigned: 'true',
@@ -81,12 +83,20 @@ module.exports = async function decorate(xml, {
         ]
       }
     ],
-    SingleLogoutService: [{
-      $: {
-        Binding: 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect',
-        Location: entityID.replace(/\/saml2\/metadata\/?$/, '') + '/logout'
+    SingleLogoutService: [
+      {
+        $: {
+          Binding: 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect',
+          Location: baseUrl + '/logout'
+        }
+      },
+      {
+        $: {
+          Binding: 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST',
+          Location: baseUrl + '/logout/post'
+        }
       }
-    }],
+    ],
     NameIDFormat: ['urn:oasis:names:tc:SAML:2.0:nameid-format:persistent'],
     AssertionConsumerService: [
       {
@@ -94,7 +104,7 @@ module.exports = async function decorate(xml, {
           index: '0',
           isDefault: 'true',
           Binding: 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST',
-          Location: entityID.replace(/\/saml2\/metadata\/?$/, '') + '/login/callback'
+          Location: baseUrl + '/login/callback'
         }
       },
       {
@@ -102,13 +112,13 @@ module.exports = async function decorate(xml, {
           index: '1',
           isDefault: 'false',
           Binding: 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Artifact',
-          Location: entityID.replace(/\/saml2\/metadata\/?$/, '') + '/login/callback'
+          Location: baseUrl + '/login/callback'
         }
       }
     ]
   };
 
-  // Substitui SPSSODescriptor completo na ordem correta
+  // Substitui o SPSSODescriptor completo com a ordem correta
   entityDescriptor.SPSSODescriptor[0] = spsso;
 
   // Organization
