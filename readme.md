@@ -97,7 +97,7 @@ Caso deseje apenas testar a aplicação, esta etapa não é obrigatória.
 
 ### 2. Configurar variáveis de ambiente
 
-Você pode modificar as variáveis de ambiente que ficam definidas no arquivo [`.env`](./.env), localizado na raiz do projeto, para refletir o seu ambiente de execução — por exemplo, o FQDN local, os caminhos de certificados, o nome da organização, os dados de contato técnico, etc.
+Você pode modificar as variáveis de ambiente que ficam definidas no arquivo [`.env`](./.env), localizado na raiz do projeto, para refletir o seu ambiente de execução.
 
 Essas configurações incluem:
 
