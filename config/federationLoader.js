@@ -11,7 +11,7 @@ const FED_URL = process.env.FED_METADATA_URL || 'https://ds.cafeexpresso.rnp.br/
 const CACHE_DIR = process.env.FED_METADATA_CACHE_DIR || path.join(os.tmpdir(), 'fed-cache');
 const CACHE_XML = path.join(CACHE_DIR, 'ds-metadata.xml');
 
-// ⚠️ Leitura do certificado e chave privada do SP
+// Leitura do certificado e chave privada do SP
 let spCert, spKey;
 (async () => {
   try {
@@ -86,8 +86,8 @@ async function refreshMetadata() {
           identifierFormat: 'urn:oasis:names:tc:SAML:2.0:nameid-format:persistent',
 
           wantAssertionsSigned: true,
-          authnRequestBinding: 'HTTP-Redirect', // <-- ALTERADO AQUI
-          signRequest: true,                // <-- MANTIDO
+          authnRequestBinding: 'HTTP-Redirect', 
+          signRequest: true,               
 
           // SP config necessário para assinatura
           cert: spCert,
