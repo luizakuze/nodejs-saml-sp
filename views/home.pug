@@ -1,10 +1,50 @@
 doctype html
 html(lang="pt-br")
   head
-    title= title || 'SP Node'
+    title= title || 'Provedor de Serviço Node.js'
     meta(charset="utf-8")
-    link(rel="stylesheet", href="https://cdn.jsdelivr.net/npm/bootstrap@3/dist/css/bootstrap.min.css")
-  body.container
-    h1 SP Node – exemplo
-    p
-      a.btn.btn-primary(href="/login/disco") Entrar
+    style.
+      body {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        background-color: #f5f5f5;
+        margin: 0;
+        font-family: Arial, sans-serif;
+      }
+      .auth-container {
+        background-color: white;
+        padding: 30px;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        text-align: center;
+        width: 350px;
+      }
+      .auth-container h1 {
+        font-size: 22px;
+        margin-bottom: 20px;
+        color: #333;
+      }
+      .auth-button {
+        width: 100%;
+        background-color: #007bff;
+        color: white;
+        padding: 12px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 16px;
+        margin-top: 15px;
+      }
+      .auth-button:hover {
+        background-color: #0056b3;
+      }
+  body
+    .auth-container
+      h1 Provedor de Serviço
+      p(style="margin-top: -10px; margin-bottom: 20px; color: #666; font-size: 14px;")
+        | Desenvolvido em 
+        strong Node.js
+      form(method="get", action="/login/disco")
+        button.auth-button(type="submit") Entrar

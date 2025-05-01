@@ -8,7 +8,7 @@
         <Extensions>
             <mdui:UIInfo xmlns:mdui="urn:oasis:names:tc:SAML:metadata:ui">
                 <mdui:DisplayName xml:lang="en">SP NODE JS</mdui:DisplayName>
-                <mdui:Description xml:lang="en">Provedor de serviços Node JS</mdui:Description>
+                <mdui:Description xml:lang="en">Provedor de servicos Node JS</mdui:Description>
                 <mdui:InformationURL xml:lang="en">http://sp.information.url/</mdui:InformationURL>
                 <mdui:PrivacyStatementURL xml:lang="en">http://sp.privacy.url/</mdui:PrivacyStatementURL>
             </mdui:UIInfo>
@@ -69,13 +69,13 @@
             <EncryptionMethod Algorithm="http://www.w3.org/2001/04/xmlenc#aes128-cbc" />
         </KeyDescriptor>
         <SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect"
-            Location="http://sp-node:8000/logout" />
+            Location="https://sp-node:8000/logout" />
         <NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:persistent</NameIDFormat>
         <AssertionConsumerService index="0" isDefault="true"
             Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"
-            Location="http://sp-node:8000/login/callback" />
+            Location="https://sp-node:8000/login/callback" />
         <AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Artifact"
-            Location="http://sp-node:8000/login/callback" index="1" isDefault="false" />
+            Location="https://sp-node:8000/login/callback" index="1" isDefault="false" />
     </SPSSODescriptor>
     <Organization>
         <OrganizationName xml:lang="pt-br">GIdLab</OrganizationName>

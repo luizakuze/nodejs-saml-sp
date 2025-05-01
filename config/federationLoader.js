@@ -91,7 +91,9 @@ async function refreshMetadata() {
 
           // SP config necessário para assinatura
           cert: spCert,
-          privateKey: spKey
+          privateKey: spKey,
+          // <-- chave para descriptografar Assertions encriptadas
+          decryptionPvk: spKey,
         }];
       })
       .filter(Boolean)
