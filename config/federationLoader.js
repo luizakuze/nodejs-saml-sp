@@ -1,5 +1,5 @@
 /**
- * @file federationLoader.js
+ * @file config/federationLoader.js
  *
  * Processa o metadado da federação SAML.
  * Constrói dinamicamente a configuração dos provedores de identidade (IdPs) a partir do metadata XML.
@@ -19,9 +19,9 @@ const os = require('os');
 
 // URLs e caminhos de cache derivados do .env
 const FED_URL = process.env.SAML_METADATA;
-const HOSTNAME = process.env.HOSTNAME || 'localhost';
+const FQDN = process.env.FQDN || 'localhost';
 const PORT = process.env.PORT || '8000';
-const BASE_URL = `https://${HOSTNAME}:${PORT}`;
+const BASE_URL = `https://${FQDN}:${PORT}`;
 const SAML_ISSUER = `${BASE_URL}/saml2/metadata/`;
 
 const CACHE_DIR = path.join(os.tmpdir(), 'fed-cache');

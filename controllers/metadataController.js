@@ -14,9 +14,9 @@ const decorate = require('../config/metadataDecorator');
 const { generateServiceProviderMetadata } = require('@node-saml/node-saml');
 
 // Informações dinâmicas do SP baseadas no ambiente
-const HOSTNAME = process.env.HOSTNAME || 'localhost';
+const FQDN = process.env.FQDN || 'localhost';
 const PORT = process.env.PORT || '8000';
-const BASE_URL = process.env.BASE_URL || `https://${HOSTNAME}:${PORT}`;
+const BASE_URL = process.env.BASE_URL || `https://${FQDN}:${PORT}`;
 const ENTITY_ID = `${BASE_URL}/saml2/metadata/`;
 const CALLBACK_URL = `${BASE_URL}/login/callback`;
 const DISCOVERY_URL = `${BASE_URL}/login/disco`;

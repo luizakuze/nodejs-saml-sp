@@ -21,7 +21,7 @@ const metadataCtl = require('../controllers/metadataController');
 
 const BASE_URL =
   process.env.BASE_URL ||
-  `https://${process.env.HOSTNAME}:${process.env.PORT}`;
+  `https://${process.env.FQDN}:${process.env.PORT}`;
 
 const DS_URL = process.env.DISCOVERY_SERVICE_URL || 'https://ds.cafeexpresso.rnp.br/WAYF.php';
 

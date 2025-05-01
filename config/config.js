@@ -15,11 +15,11 @@ const assert = require('assert');
 assert.ok(process.env.SAML_METADATA, 'Environment variable SAML_METADATA is required');
 
 // leitura com fallback seguro
-const HOSTNAME = process.env.HOSTNAME || 'localhost';
+const FQDN = process.env.FQDN || 'localhost';
 const PORT = process.env.PORT || '8000';
 
 // monta dinamicamente a URL base e o entityID (issuer)
-const BASE_URL = `https://${HOSTNAME}:${PORT}`;
+const BASE_URL = `https://${FQDN}:${PORT}`;
 const SAML_ISSUER = `${BASE_URL}/saml2/metadata/`;
 
 
@@ -27,8 +27,8 @@ module.exports = {
   development: {
     app: {
       name: 'Passport‑SAML Node SP',
-      hostname: HOSTNAME,
-      host: `${HOSTNAME}:${PORT}`,
+      FQDN: FQDN,
+      host: `${FQDN}:${PORT}`,
       port: PORT
     },
     passport: {

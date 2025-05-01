@@ -2,30 +2,27 @@
 
 Esta aplicação Node.js implementa um provedor de serviço (SP) que autentica usuários via protocolo SAML2, utilizando a biblioteca `passport-saml` e um Discovery Service (DS) para integrar-se com provedores de identidade (IdP) em uma federação acadêmica ou institucional.
 
+
 ### Sumário
 
 - [Estrutura do Projeto](#estrutura-do-projeto)
-- [Instalação](#instalação)
 - [Execução](#execução)
-- [Preparação de Ambiente](#preparação-de-ambiente)
-  - [Gerar certificados](#1-gerar-certificados)
+- [Preparando ambiente para novo contexto](#preparando-ambiente-para-novo-contexto)
+  - [Gerar novos certificados](#1-gerar-novos-certificados)
   - [Configurar variáveis de ambiente](#2-configurar-variáveis-de-ambiente)
-
 ---
 
 ## Estrutura do Projeto
 
 ```bash
 .
-├── app.js                         # Arquivo principal da aplicação (entrypoint)
-├── bower.json                     # (Opcional) dependências do frontend
-├── certs                          # Diretório com os certificados SAML
-│   ├── sp-private-key.pem         # Chave privada do SP (para assinatura)
-│   └── sp-public-cert.pem         # Certificado público do SP (para metadata)
+├── certs                          # Diretório com os certificados para asserções SAML
+│   ├── sp-private-key.pem          
+│   └── sp-public-cert.pem          
 ├── config                         # Configurações e middlewares
-│   ├── config.js                  # Carrega variáveis de ambiente e opções do SP
-│   ├── federationLoader.js        # Lida com discovery service e metadados dinâmicos
-│   ├── metadataDecorator.js       # Ajustes e enriquecimento do metadata SAML
+│   ├── config.js                  # Carrega variáveis de ambiente  
+│   ├── federationLoader.js        # Processa o conteúdo do discovery service  
+│   ├── metadataDecorator.js       # Ajustes para gerar o metadado do SP
 │   ├── passport.js                # Estratégia `passport-saml` configurada
 │   └── routes.js                  # Define as rotas da aplicação
 ├── controllers                    # Lógica dos endpoints
@@ -33,26 +30,22 @@ Esta aplicação Node.js implementa um provedor de serviço (SP) que autentica u
 │   ├── logoutController.js
 │   ├── metadataController.js
 │   └── usersController.js
-├── metadado-sp.xml               # (opcional) Metadado gerado ou salvo manualmente
-├── package.json                   # Dependências e informações do projeto
-├── package-lock.json              # Lockfile das dependências
-├── Procfile                       # Arquivo para deploy no Heroku ou ambientes semelhantes
-├── ssl.js                         # Suporte a HTTPS local (localhost)
-├── validate.sh                    # Script de validação de ambiente/configuração
 └── views                          # Templates renderizados (Pug)
-    ├── error.pug
     ├── home.pug
     └── users.pug
+├── app.js                         # Arquivo principal da aplicação  
+├── metadado-sp.xml                # Metadado do SP (obtido em 'https:fqdn:port/saml2/metadata')
+├── package.json                   # Dependências do projeto
+├── ssl.js                         
+
 ```
 
----
-
-## Instalação
+## Execução
 
 1. Clone o repositório:
 
    ```bash
-   git clone https://git.rnp.br/gidlab/nodejs-saml-sp
+   https://github.com/luizakuze/nodejs-saml-sp
    cd nodejs-saml-sp
    ```
 
@@ -62,65 +55,57 @@ Esta aplicação Node.js implementa um provedor de serviço (SP) que autentica u
    npm install
    ```
 
-3. (Opcional) Configure o domínio local para testes:
+3. Exexcute a aplicação:
 
    ```bash
-   echo "127.0.0.1 sp-node" | sudo tee -a /etc/hosts
-   ```
+   npm start
+   ``` 
+ 
 
----
+> Nota: Configurar o domínio local (teste da aplicação):
+>
+> Adicione o seguinte mapeamento ao arquivo `/etc/hosts` para que o domínio `sp-node` funcione localmente:
+>
+> ```bash
+> echo "127.0.0.1 sp-node" | sudo tee -a /etc/hosts
+> ```
 
-## Execução
 
-Execute localmente com HTTPS e logging ativado:
+## Preparando ambiente para novo contexto
+Caso deseje apenas testar a aplicação, esta etapa não é obrigatória.  
 
-```bash
-npm start
-```
+### 1. Gerar novos certificados  
+ 
+> 📝 Embora o repositório já inclua certificados prontos, é recomendável gerar os seus próprios.
 
-> O servidor escutará por padrão em `https://sp-node:8000`
+   1. **Remover os certificados atuais do diretório `Certificates`**:
 
----
+      ```bash
+      rm certs/*
+      ```
 
-## Preparação de Ambiente
+   2. **Gerar novos certificados**:
+   Os comandos abaixo geram os certificados utilizados para assinar e encriptar as asserções SAML, e os colocam no diretório `certs`.
 
-### 1. Gerar certificados
+      ```bash 
+      # Gerar chave privada
+      openssl genrsa -out certs/sp-private-key.pem 2048
 
-Se desejar utilizar seus próprios certificados para assinatura e encriptação SAML:
-
-```bash
-mkdir -p certs
-
-# Gerar chave privada
-openssl genrsa -out certs/sp-private-key.pem 2048
-
-# Gerar certificado público
-openssl req -new -x509 -key certs/sp-private-key.pem -out certs/sp-public-cert.pem -days 365
-```
-
-Esses arquivos devem corresponder aos caminhos definidos nas variáveis de ambiente.
-
----
+      # Gerar certificado público
+      openssl req -new -x509 -key certs/sp-private-key.pem -out certs/sp-public-cert.pem -days 365
+      ```
 
 ### 2. Configurar variáveis de ambiente
 
-Você pode criar um arquivo `.env` ou definir diretamente no seu sistema as seguintes variáveis:
+Você pode modificar as variáveis de ambiente que ficam definidas no arquivo [`.env`](./.env), localizado na raiz do projeto, para refletir o seu ambiente de execução — por exemplo, o FQDN local, os caminhos de certificados, o nome da organização, os dados de contato técnico, etc.
 
-```ini
-PORT=8000
-SAML_ENTITY_ID=https://sp-node:8000/saml2/metadata/
-SAML_CALLBACK_URL=https://sp-node:8000/login/callback
-SAML_DISCOVERY_SERVICE_URL=https://ds.cafeexpresso.rnp.br/WAYF.php
-SAML_METADATA_URL=https://ds.cafeexpresso.rnp.br/metadata/ds-metadata.xml
-PRIVATE_KEY_PATH=certs/sp-private-key.pem
-CERTIFICATE_PATH=certs/sp-public-cert.pem
-```
+Essas configurações incluem:
 
-- `SAML_ENTITY_ID`: URL de identificação do SP (exposta no metadata)
-- `SAML_CALLBACK_URL`: URL onde o IdP retornará a resposta SAML
-- `SAML_DISCOVERY_SERVICE_URL`: URL do DS da federação (ex: Café Expresso)
-- `PRIVATE_KEY_PATH` / `CERTIFICATE_PATH`: caminhos para a chave privada e certificado do SP
+* Informações do provedor de serviço (`FQDN`, `PORT`);
+* Segredo da sessão para assinar os cookies (`SESSION_SECRET`);
+* Certificados SSL para execução local em HTTPS (`SSL_KEY`, `SSL_CERT`, opcionais);
+* Informações da organização responsável pelo SP (`ORG_NAME`, `ORG_DISPLAY_NAME`, `ORG_URL`);
+* Informações de contato técnico (`TECH_COMPANY`, `TECH_GIVEN_NAME`, `TECH_SURNAME`, `TECH_EMAIL`);
+* Informações adicionais exibidas no Discovery Service (`UI_DISPLAY_NAME`, `UI_DESCRIPTION`, `UI_INFO_URL`, `UI_PRIVACY_URL`).
 
----
-
-Agora a aplicação está pronta para participar de um fluxo de autenticação federado via SAML2.
+ 
