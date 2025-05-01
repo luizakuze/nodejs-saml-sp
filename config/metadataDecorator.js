@@ -12,18 +12,20 @@ module.exports = async function decorate(xml, {
   const entityDescriptor = doc.EntityDescriptor;
   const spsso = entityDescriptor.SPSSODescriptor[0];
 
-  // a) EntityDescriptor
+  // EntityDescriptor
   entityDescriptor.$.entityID = entityID;
-  entityDescriptor.$['xmlns:saml2'] = 'urn:oasis:names:tc:SAML:2.0:assertion';
   entityDescriptor.$.ID = entityID.replace(/[^\w]/g, '_');
   entityDescriptor.$.cacheDuration = 'PT1H';
+  entityDescriptor.$['xmlns:saml2'] = 'urn:oasis:names:tc:SAML:2.0:assertion';
 
-  // b) SPSSODescriptor
-  spsso.$.AuthnRequestsSigned = 'true';
-  spsso.$.WantAssertionsSigned = 'true';
-  spsso.$.protocolSupportEnumeration = 'urn:oasis:names:tc:SAML:2.0:protocol';
+  // SPSSODescriptor atributos na ordem correta
+  spsso.$ = {
+    AuthnRequestsSigned: 'true',
+    WantAssertionsSigned: 'true',
+    protocolSupportEnumeration: 'urn:oasis:names:tc:SAML:2.0:protocol'
+  };
 
-  // c) Extensions
+  // Extensions
   const extensions = {
     'mdui:UIInfo': [{
       '$': { 'xmlns:mdui': 'urn:oasis:names:tc:SAML:metadata:ui' },
@@ -55,10 +57,10 @@ module.exports = async function decorate(xml, {
     }]
   };
 
-  // d) Certificado formatado com quebras de linha
+  // Certificado formatado
   const formattedCert = certBase64.replace(/(.{64})/g, '$1\n');
 
-  // e) KeyDescriptors
+  // KeyDescriptors
   const keyDescriptors = [
     {
       $: { use: 'signing' },
@@ -84,7 +86,7 @@ module.exports = async function decorate(xml, {
     }
   ];
 
-  // f) SingleLogoutService – corrigido
+  // SingleLogoutService
   const logoutLocation = entityID.replace(/\/saml2\/metadata\/?$/, '') + '/logout';
   const singleLogoutServices = [{
     $: {
@@ -93,10 +95,10 @@ module.exports = async function decorate(xml, {
     }
   }];
 
-  // g) NameIDFormat
+  // NameIDFormat
   const nameIDFormat = ['urn:oasis:names:tc:SAML:2.0:nameid-format:persistent'];
 
-  // h) AssertionConsumerService
+  // AssertionConsumerService
   const acsLocation = entityID.replace(/\/saml2\/metadata\/?$/, '') + '/login/callback';
   const acsList = [
     {
@@ -117,14 +119,21 @@ module.exports = async function decorate(xml, {
     }
   ];
 
-  // i) Atualiza SPSSODescriptor com ordem correta
+  // Limpar e reinserir os elementos na ordem correta
+  delete spsso.Extensions;
+  delete spsso.KeyDescriptor;
+  delete spsso.SingleLogoutService;
+  delete spsso.NameIDFormat;
+  delete spsso.AssertionConsumerService;
+
+  // Inserir na ordem esperada
   spsso.Extensions = [extensions];
   spsso.KeyDescriptor = keyDescriptors;
   spsso.SingleLogoutService = singleLogoutServices;
   spsso.NameIDFormat = nameIDFormat;
   spsso.AssertionConsumerService = acsList;
 
-  // j) Organization
+  // Organization
   entityDescriptor.Organization = [{
     OrganizationName: [{
       _: org.name,
@@ -140,7 +149,7 @@ module.exports = async function decorate(xml, {
     }]
   }];
 
-  // k) ContactPerson
+  // ContactPerson
   entityDescriptor.ContactPerson = [{
     $: { contactType: 'technical' },
     Company: [techContact.company],
