@@ -1,24 +1,68 @@
 // config/routes.js
-const express = require('express');
-const router  = express.Router();
+const express   = require('express');
+const router    = express.Router();
+const passport  = require('passport');
 
-const home    = require('../controllers/homeController');
-const users   = require('../controllers/usersController');
-const logoutC = require('../controllers/logoutController');
+const usersCtl  = require('../controllers/usersController');
+const homeCtl   = require('../controllers/homeController');
+const logoutCtl = require('../controllers/logoutController');
 
-module.exports = (app, config, passport) => {
-  /* Página inicial */
-  router.get('/',  home.indexGet);
-  router.post('/', home.indexPost(
-    passport.authenticate(config.passport.strategy)
-  ));
+/* -------------------------------------------------------------
+ * BASE_URL: usado para o retorno do Discovery Service
+ * ------------------------------------------------------------- */
+const BASE_URL =
+  process.env.BASE_URL ||
+  `https://${process.env.HOSTNAME || 'localhost'}:${process.env.PORT || 8000}`;
 
-  /* Área protegida */
-  router.get('/users', users.index);
+/* -------------------------------------------------------------
+ * Página inicial
+ * ------------------------------------------------------------- */
+router.get('/', homeCtl.indexGet);
 
-  /* Logout */
-  router.get('/logout', logoutC.index);
+/* -------------------------------------------------------------
+ * Discovery Service (WAYF) da RNP
+ *  • Se NÃO houver ?idp=  → redireciona para o DS
+ *  • Se houver  ?idp=     → grava IdP e dispara AuthnRequest
+ * ------------------------------------------------------------- */
+router.get('/login/disco', (req, res, next) => {
+  /* — retorno do WAYF? — */
+  if (req.query.idp) {
+    req.session.idpEntityID = req.query.idp;        // guarda escolha
+    return passport.authenticate('saml')(req, res, next);
+  }
 
-  /* Registra todas as rotas no app */
-  app.use(router);
-};
+  /* — primeira visita: manda para o WAYF — */
+  const dsURL       = 'https://ds.cafeexpresso.rnp.br/WAYF.php';
+  const returnURL   = encodeURIComponent(`${BASE_URL}/login/disco`);
+  const spEntityID  = encodeURIComponent(process.env.SAML_ISSUER);
+
+  res.redirect(
+    `${dsURL}?entityID=${spEntityID}` +
+    `&return=${returnURL}&returnIDParam=idp`
+  );
+});
+
+/* -------------------------------------------------------------
+ * Assertion Consumer Service
+ * ------------------------------------------------------------- */
+router.post(
+  '/login/callback',
+  passport.authenticate('saml', { failureRedirect: '/' }),
+  usersCtl.index
+);
+
+/* -------------------------------------------------------------
+ * Logout
+ * ------------------------------------------------------------- */
+router.get('/logout', logoutCtl.index);
+
+/* -------------------------------------------------------------
+ * Área protegida
+ * ------------------------------------------------------------- */
+router.get(
+  '/users',
+  (req, res, next) => (req.isAuthenticated() ? next() : res.redirect('/')),
+  usersCtl.index
+);
+
+module.exports = router;

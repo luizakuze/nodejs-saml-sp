@@ -1,3 +1,6 @@
+// ───────────────────────────────────────────────────────────────
+// file: config/config.js
+// ───────────────────────────────────────────────────────────────
 const os = require('os');
 const assert = require('assert');
 const fileCache = require('file-system-cache').default;
@@ -7,22 +10,22 @@ assert.ok(process.env.SAML_METADATA, 'Environment variable SAML_METADATA is requ
 
 const hostname = process.env.HOSTNAME || os.hostname();
 const port = process.env.PORT || 8000;
-const host = hostname + (port != 443 ? ':' + port : '');
+const host = `${hostname}:${port}`;
 
 module.exports = {
   development: {
     app: {
-      name: 'Passport SAML strategy example',
-      hostname: hostname,
-      host: host,
-      port: port
+      name: 'Passport‑SAML Node SP',
+      hostname,
+      host,
+      port
     },
     passport: {
       strategy: 'saml',
       saml: {
         path: '/login/callback',
-        callbackUrl: `http://${host}/login/callback`,
-        logoutCallbackUrl: `http://${host}/logout`,
+        callbackUrl: `https://${host}/login/callback`,
+        logoutCallbackUrl: `https://${host}/logout`,
         issuer: process.env.SAML_ISSUER,
         metadata: {
           url: process.env.SAML_METADATA,

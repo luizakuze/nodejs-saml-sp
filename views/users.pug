@@ -1,0 +1,10 @@
+doctype html
+html(lang="pt-br")
+  head
+    meta(charset="utf-8")
+    title Usuário
+  body.container
+    h2 Olá #{firstName} #{lastName}
+    p Nome de usuário: #{username}
+    p E-mail: #{email}
+    a.btn.btn-default(href="/logout") Sair

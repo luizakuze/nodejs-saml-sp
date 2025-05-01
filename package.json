@@ -8,6 +8,7 @@
   },
   "dependencies": {
     "@node-saml/passport-saml": "^5.0.1",
+    "@xmldom/xmldom": "^0.9.8",
     "body-parser": "^2.2.0",
     "cookie-parser": "^1.4.7",
     "dotenv": "^16.5.0",
@@ -16,11 +17,13 @@
     "express-session": "^1.18.1",
     "file-system-cache": "^1.0.5",
     "morgan": "^1.10.0",
+    "node-cron": "^3.0.3",
     "passport": "^0.6.0",
     "passport-saml": "^3.2.4",
     "passport-saml-metadata": "^5.0.0",
     "pem-promise": "^1.0.0",
     "pug": "^3.0.3",
-    "xml2js": "^0.6.2"
+    "xml2js": "^0.6.2",
+    "xpath": "^0.0.34"
   }
 }

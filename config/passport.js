@@ -1,45 +1,32 @@
-const metadata = require('passport-saml-metadata');
-const SamlStrategy = require('passport-saml').Strategy;
-const fs = require('fs'); // Melhor já importar no topo
+const { MultiSamlStrategy } = require('@node-saml/passport-saml');
+const federation            = require('./federationLoader');
 
-module.exports = function (app, passport, config) {
-  metadata.fetch(config.passport.saml.metadata)
-    .then(function (reader) {
-      const strategyConfig = metadata.toPassportConfig(reader);
+module.exports = (passport) => {
+  passport.use(new MultiSamlStrategy(
+    {
+      passReqToCallback : true,
+      /* escolhe o IdP olhando query ou sessão ----------------- */
+      getSamlOptions    : (req, done) => {
+        try {
+          const entityID = req.query.idp || req.session.idpEntityID;
+          return done(null, federation.getConfig(entityID));
+        } catch (err) {
+          return done(err);
+        }
+      }
+    },
+    /* ---------------- verify (login) ------------------------- */
+    (req, profile, done) => {
+      /* TODO: procure usuário no seu DB – abaixo é só mock */
+      done(null, { email: profile.email, ...profile });
+    },
+    /* --------------- verify (single logout) ------------------ */
+    (req, profile, done) => {
+      /* idem – match pelo NameID recebido no LogoutRequest      */
+      done(null, { nameID: profile.nameID });
+    }
+  ));
 
-      strategyConfig.callbackUrl = config.passport.saml.callbackUrl;
-      strategyConfig.logoutCallbackUrl = config.passport.saml.logoutCallbackUrl;
-      strategyConfig.issuer = config.passport.saml.issuer;
-      strategyConfig.identifierFormat = 'urn:oasis:names:tc:SAML:2.0:nameid-format:persistent';
-      strategyConfig.wantAssertionsSigned = true;
-      strategyConfig.wantAuthnResponseSigned = true;
-      strategyConfig.authnRequestBinding = 'HTTP-POST';
-      strategyConfig.forceAuthn = false;
-      strategyConfig.acceptUnsolicitedResponses = false;
-      strategyConfig.authnRequestsSigned = true;
-
-      // 💥 Garante que o cert está presente
-      const spPublicCert = fs.readFileSync('./certs/sp-public-cert.pem', 'utf-8');
-
-      strategyConfig.cert = strategyConfig.cert || spPublicCert;
-      strategyConfig.privateKey = fs.readFileSync('./certs/sp-private-key.pem', 'utf-8');
-      strategyConfig.decryptionPvk = strategyConfig.privateKey;
-
-      passport.use('saml', new SamlStrategy(strategyConfig, function (profile, done) {
-        profile = metadata.claimsToCamelCase(profile, reader.claimSchema);
-        return done(null, profile);
-      }));
-
-      passport.serializeUser(function (user, done) {
-        done(null, user);
-      });
-
-      passport.deserializeUser(function (user, done) {
-        done(null, user);
-      });
-    })
-    .catch((err) => {
-      console.error('Error loading SAML metadata', err);
-      process.exit(1);
-    });
+  passport.serializeUser((user, done)   => done(null, user));
+  passport.deserializeUser((obj, done) => done(null, obj));
 };
