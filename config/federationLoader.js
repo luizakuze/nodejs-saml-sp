@@ -11,6 +11,18 @@ const FED_URL = process.env.FED_METADATA_URL || 'https://ds.cafeexpresso.rnp.br/
 const CACHE_DIR = process.env.FED_METADATA_CACHE_DIR || path.join(os.tmpdir(), 'fed-cache');
 const CACHE_XML = path.join(CACHE_DIR, 'ds-metadata.xml');
 
+// ⚠️ Leitura do certificado e chave privada do SP
+let spCert, spKey;
+(async () => {
+  try {
+    spCert = await fs.readFile('./certs/sp-public-cert.pem', 'utf-8');
+    spKey  = await fs.readFile('./certs/sp-private-key.pem', 'utf-8');
+  } catch (e) {
+    console.error('Erro ao carregar chave/cert do SP:', e.message);
+    process.exit(1);
+  }
+})();
+
 let idpIndex = Object.create(null);
 
 async function refreshMetadata() {
@@ -42,9 +54,6 @@ async function refreshMetadata() {
         const reader = new metadata.MetadataReader(idpXml);
         const cfg = metadata.toPassportConfig(reader, { multipleCerts: true });
 
-        console.log('DEBUG cfg:', reader.entityId, cfg); // <--- ADICIONADO
-
-        // Tenta pegar certificados normalmente
         let certs = [].concat(
           cfg.cert ?? [],
           cfg.certs ?? [],
@@ -52,11 +61,10 @@ async function refreshMetadata() {
           cfg.certificates ?? []
         ).filter(Boolean);
 
-        // Se não encontrou, tenta extrair manualmente com xpath
         if (certs.length === 0) {
           const certNodes = select('.//ds:X509Certificate', node);
           certs = certNodes.map(certNode => certNode.textContent);
-          console.log(`⚠️  ${reader.entityId} – certificados extraídos manualmente:`, certs.length);
+          console.warn(`⚠️  ${reader.entityId} – certificados extraídos manualmente:`, certs.length);
         }
 
         const normalizedCerts = certs.map(c =>
@@ -72,11 +80,18 @@ async function refreshMetadata() {
           entryPoint: cfg.entryPoint,
           logoutUrl: cfg.logoutUrl,
           idpCert: normalizedCerts.length === 1 ? normalizedCerts[0] : normalizedCerts,
+
           issuer: process.env.SAML_ISSUER,
           callbackUrl: `${process.env.BASE_URL}/login/callback`,
           identifierFormat: 'urn:oasis:names:tc:SAML:2.0:nameid-format:persistent',
+
           wantAssertionsSigned: true,
-          authnRequestBinding: 'HTTP-Redirect'
+          authnRequestBinding: 'HTTP-Redirect', // <-- ALTERADO AQUI
+          signRequest: true,                // <-- MANTIDO
+
+          // SP config necessário para assinatura
+          cert: spCert,
+          privateKey: spKey
         }];
       })
       .filter(Boolean)
