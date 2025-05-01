@@ -76,7 +76,7 @@ Caso deseje apenas testar a aplicação, esta etapa não é obrigatória.
 
 ### 1. Gerar novos certificados  
  
-> 📝 Embora o repositório já inclua certificados prontos, é recomendável gerar os seus próprios.
+> 📝 Embora o repositório já inclua certificados prontos, é recomendável gerar os seus próprios. Mas é importante salvar os atuais em outro local caso deseje rodar a aplicação de teste novamente.
 
    1. **Remover os certificados atuais do diretório `Certificates`**:
 
