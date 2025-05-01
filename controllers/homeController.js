@@ -1,7 +1,10 @@
 /**
- * GET /
- * Exibe a página inicial com botão "Entrar"
+ * @file controllers/homeController.js
+ *
+ * Controlador da página inicial da aplicação.
  */
+ 
+// GET 
 exports.indexGet = (_req, res) => {
   res.render('home'); // carrega home.pug
 };

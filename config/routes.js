@@ -1,71 +1,82 @@
-// config/routes.js
-const express   = require('express');
-const router    = express.Router();
-const passport  = require('passport');
+/**
+ * @file config/routes.js
+ *
+ * Define as rotas principais da aplicação, incluindo:
+ * - Página inicial
+ * - Autenticação via Discovery Service (WAYF)
+ * - Callback do SAML
+ * - Logout
+ * - Área protegida para usuários autenticados
+ * - Exposição dos metadados SAML do SP
+ */
 
-const usersCtl  = require('../controllers/usersController');
-const homeCtl   = require('../controllers/homeController');
+const express = require('express');
+const router = express.Router();
+const passport = require('passport');
+
+const usersCtl = require('../controllers/usersController');
+const homeCtl = require('../controllers/homeController');
 const logoutCtl = require('../controllers/logoutController');
 const metadataCtl = require('../controllers/metadataController');
 
-/* -------------------------------------------------------------
- * BASE_URL: usado para o retorno do Discovery Service
- * ------------------------------------------------------------- */
 const BASE_URL =
   process.env.BASE_URL ||
-  `https://${process.env.HOSTNAME || 'localhost'}:${process.env.PORT || 8000}`;
+  `https://${process.env.HOSTNAME}:${process.env.PORT}`;
 
-/* -------------------------------------------------------------
- * Página inicial
- * ------------------------------------------------------------- */
+const DS_URL = process.env.DISCOVERY_SERVICE_URL || 'https://ds.cafeexpresso.rnp.br/WAYF.php';
+
+/**
+ * Rota inicial da aplicação.
+ */
 router.get('/', homeCtl.indexGet);
 
-/* -------------------------------------------------------------
- * Discovery Service (WAYF) da RNP
- *  • Se NÃO houver ?idp=  → redireciona para o DS
- *  • Se houver  ?idp=     → grava IdP e dispara AuthnRequest
- * ------------------------------------------------------------- */
+/**
+ * Rota de login com Discovery Service (WAYF da RNP).
+ * Se `?idp` estiver presente, armazena o entityID na sessão e inicia autenticação.
+ * Caso contrário, redireciona para o WAYF.
+ */
 router.get('/login/disco', (req, res, next) => {
-  /* — retorno do WAYF? — */
   if (req.query.idp) {
-    req.session.idpEntityID = req.query.idp;        // guarda escolha
+    req.session.idpEntityID = req.query.idp;
     return passport.authenticate('saml')(req, res, next);
   }
 
-  /* — primeira visita: manda para o WAYF — */
-  const dsURL       = 'https://ds.cafeexpresso.rnp.br/WAYF.php';
-  const returnURL   = encodeURIComponent(`${BASE_URL}/login/disco`);
-  const spEntityID  = encodeURIComponent(process.env.SAML_ISSUER);
+  const returnURL = encodeURIComponent(`${BASE_URL}/login/disco`);
+  const spEntityID = encodeURIComponent(`${BASE_URL}/saml2/metadata/`);
 
   res.redirect(
-    `${dsURL}?entityID=${spEntityID}` +
+    `${DS_URL}?entityID=${spEntityID}` +
     `&return=${returnURL}&returnIDParam=idp`
   );
 });
 
-/* -------------------------------------------------------------
- * Assertion Consumer Service
- * ------------------------------------------------------------- */
+/**
+ * Callback SAML após autenticação do IdP.
+ * Redireciona para a rota protegida se bem-sucedido, ou volta à página inicial em caso de falha.
+ */
 router.post(
   '/login/callback',
   passport.authenticate('saml', { failureRedirect: '/' }),
   usersCtl.index
 );
 
-/* -------------------------------------------------------------
- * Logout
- * ------------------------------------------------------------- */
+/**
+ * Rota de logout, destrói a sessão local e inicia logout com o IdP.
+ */
 router.get('/logout', logoutCtl.index);
 
-/* -------------------------------------------------------------
- * Área protegida
- * ------------------------------------------------------------- */
+/**
+ * Rota protegida: acessível apenas para usuários autenticados.
+ */
 router.get(
   '/users',
   (req, res, next) => (req.isAuthenticated() ? next() : res.redirect('/')),
   usersCtl.index
 );
 
+/**
+ * Rota que expõe os metadados do SP em formato XML.
+ */
 router.get('/saml2/metadata', metadataCtl);
 
 module.exports = router;

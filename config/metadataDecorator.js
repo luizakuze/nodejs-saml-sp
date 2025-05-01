@@ -1,3 +1,21 @@
+/**
+ * @file config/metadataDecorator.js
+ * 
+ * Função que modifica e enriquece um metadata XML SAML do provedor de serviço (SP).,
+ * adicionando informações visuais, endpoints, certificados e contatos conforme
+ * exigido pela federação CAFe Expresso.
+ * 
+ * Retorna um novo XML SAML pronto para ser servido em `/saml2/metadata`.
+ * 
+ * @requires xml2js
+ */
+
+/**
+ * Formata e insere no metadata XML as informações do SP (como certificado, UIInfo e logout).
+ * 
+ * @returns {Promise<string>} - Metadata SAML decorado como string XML.
+ */
+
 const { parseStringPromise, Builder } = require('xml2js');
 
 module.exports = async function decorate(xml, {
@@ -11,18 +29,17 @@ module.exports = async function decorate(xml, {
   const doc = await parseStringPromise(xml);
   const entityDescriptor = doc.EntityDescriptor;
 
-  // Atualiza atributos do EntityDescriptor
+  // Atualiza atributos principais
   entityDescriptor.$.entityID = entityID;
   entityDescriptor.$.ID = entityID.replace(/[^\w]/g, '_');
   entityDescriptor.$.cacheDuration = 'PT1H';
   entityDescriptor.$['xmlns:saml2'] = 'urn:oasis:names:tc:SAML:2.0:assertion';
 
-  // Certificado formatado (64 colunas)
+  // Formata o certificado em blocos de 64 colunas
   const formattedCert = certBase64.replace(/(.{64})/g, '$1\n');
-
-  // Construção do SPSSODescriptor na ordem exata exigida
   const baseUrl = entityID.replace(/\/saml2\/metadata\/?$/, '');
 
+  // Define o SPSSODescriptor (serviços oferecidos pelo SP)
   const spsso = {
     $: {
       AuthnRequestsSigned: 'true',
@@ -118,10 +135,10 @@ module.exports = async function decorate(xml, {
     ]
   };
 
-  // Substitui o SPSSODescriptor completo com a ordem correta
+  // Substitui o SPSSODescriptor existente
   entityDescriptor.SPSSODescriptor[0] = spsso;
 
-  // Organization
+  // Organização
   entityDescriptor.Organization = [{
     OrganizationName: [{
       _: org.name,
@@ -137,7 +154,7 @@ module.exports = async function decorate(xml, {
     }]
   }];
 
-  // ContactPerson
+  // Contato técnico
   entityDescriptor.ContactPerson = [{
     $: { contactType: 'technical' },
     Company: [techContact.company],
