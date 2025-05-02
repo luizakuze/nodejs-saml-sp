@@ -18,7 +18,7 @@ const path = require('path');
 const os = require('os');
 
 // URLs e caminhos de cache derivados do .env
-const FED_URL = process.env.SAML_METADATA;
+const FED_URL = 'https://ds.cafeexpresso.rnp.br/metadata/ds-metadata.xml';
 const FQDN = process.env.FQDN || 'localhost';
 const PORT = process.env.PORT || '8000';
 const BASE_URL = `https://${FQDN}:${PORT}`;

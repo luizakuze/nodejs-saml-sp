@@ -24,7 +24,8 @@ Esta aplicação Node.js implementa um provedor de serviço (SP) que autentica u
 │   ├── federationLoader.js        # Processa o conteúdo do discovery service  
 │   ├── metadataDecorator.js       # Ajustes para gerar o metadado do SP
 │   ├── passport.js                # Estratégia `passport-saml` configurada
-│   └── routes.js                  # Define as rotas da aplicação
+│   ├── routes.js                  # Define as rotas da aplicação
+│   └── samlAttributeMap.js        # Mapeamento de atributos SAML
 ├── controllers                    # Lógica dos endpoints
 │   ├── homeController.js
 │   ├── logoutController.js

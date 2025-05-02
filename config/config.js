@@ -9,10 +9,6 @@ require('dotenv').config(); // garante carregamento do .env
 
 const os = require('os');
 const fileCache = require('file-system-cache').default;
-const assert = require('assert');
-
-// valida variável obrigatória
-assert.ok(process.env.SAML_METADATA, 'Environment variable SAML_METADATA is required');
 
 // leitura com fallback seguro
 const FQDN = process.env.FQDN || 'localhost';
@@ -22,6 +18,8 @@ const PORT = process.env.PORT || '8000';
 const BASE_URL = `https://${FQDN}:${PORT}`;
 const SAML_ISSUER = `${BASE_URL}/saml2/metadata/`;
 
+// URL do metadata da federação SAML (IdPs disponíveis)
+const SAML_METADATA_URL = 'https://ds.cafeexpresso.rnp.br/metadata/ds-metadata.xml';
 
 module.exports = {
   development: {
@@ -39,8 +37,8 @@ module.exports = {
         logoutCallbackUrl: `${BASE_URL}/logout`,
         issuer: SAML_ISSUER,
         metadata: {
-          url: process.env.SAML_METADATA,
-          timeout: process.env.SAML_METADATA_TIMEOUT || 1500,
+          url: SAML_METADATA_URL,
+          timeout: 1500,
           backupStore: fileCache({
             basePath: process.env.SAML_METADATA_CACHE_DIR || os.tmpdir(),
             ns: SAML_ISSUER

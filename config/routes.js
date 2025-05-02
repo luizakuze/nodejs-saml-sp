@@ -23,7 +23,7 @@ const BASE_URL =
   process.env.BASE_URL ||
   `https://${process.env.FQDN}:${process.env.PORT}`;
 
-const DS_URL = process.env.DISCOVERY_SERVICE_URL || 'https://ds.cafeexpresso.rnp.br/WAYF.php';
+const DS_URL = 'https://ds.cafeexpresso.rnp.br/WAYF.php';
 
 /**
  * Rota inicial da aplicação.
